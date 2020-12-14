@@ -4,6 +4,8 @@ services:
     image: mongo
     command: --configsvr --replSet confSet --bind_ip_all
     volumes:
+      # Doesn't actually get loaded because authentication isn't enabled.
+      # Either enable authentication or execute the commands manually.
       - ./conf.js:/docker-entrypoint-initdb.d/conf.js
   mongo-sh1-replica:
     command: --shardsvr --replSet shard1Set --bind_ip_all --port 27017
