@@ -1,5 +1,6 @@
 // > use test
 sh.enableSharding("test")
+db.adminCommand({movePrimary: "test", to: "shard1Set"})
 for (var i = 0; i < 20; i++) {
   db.a.insert({value: i});
 }
