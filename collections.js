@@ -19,7 +19,7 @@ db.createCollection("c")
 db.c.ensureIndex({value: 1})
 sh.updateZoneKeyRange("test.c", {value: MinKey}, {value: 10}, "Zone2")
 sh.updateZoneKeyRange("test.c", {value: 10}, {value: MaxKey}, "Zone3")
-sh.shardCollection("c", {value: 1})
+sh.shardCollection("test.c", {value: 1})
 
 for (var i = 0; i < 20; i++) {
   db.c.insert({value: i});
