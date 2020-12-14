@@ -1,0 +1,302 @@
+mongos> sh.status()
+--- Sharding Status ---
+  sharding version: {
+  	"_id" : 1,
+  	"minCompatibleVersion" : 5,
+  	"currentVersion" : 6,
+  	"clusterId" : ObjectId("5fd345b157a485931bdfddaf")
+  }
+  shards:
+        {  "_id" : "shard1Set",  "host" : "shard1Set/mongo-sh1-replica:27017",  "state" : 1 }
+        {  "_id" : "shard2Set",  "host" : "shard2Set/mongo-sh2-replica:27017",  "state" : 1,  "tags" : [ "Zone2" ] }
+        {  "_id" : "shard3Set",  "host" : "shard3Set/mongo-sh3-replica:27017",  "state" : 1,  "tags" : [ "Zone3" ] }
+  active mongoses:
+        "4.4.2" : 1
+  autosplit:
+        Currently enabled: yes
+  balancer:
+        Currently enabled:  yes
+        Currently running:  no
+        Failed balancer rounds in last 5 attempts:  0
+        Migration Results for the last 24 hours:
+                No recent migrations
+  databases:
+        {  "_id" : "config",  "primary" : "config",  "partitioned" : true }
+                config.system.sessions
+                        shard key: { "_id" : 1 }
+                        unique: false
+                        balancing: true
+                        chunks:
+                                shard1Set	342
+                                shard2Set	341
+                                shard3Set	341
+                        too many chunks to print, use verbose if you want to force print
+        {  "_id" : "test",  "primary" : "shard1Set",  "partitioned" : true,  "version" : {  "uuid" : UUID("f43cea33-7549-4037-a4c7-8828d6bc56af"),  "lastMod" : 2 } }
+                test.b
+                        shard key: { "value" : "hashed" }
+                        unique: false
+                        balancing: true
+                        chunks:
+                                shard1Set	2
+                                shard2Set	2
+                                shard3Set	2
+                        { "value" : { "$minKey" : 1 } } -->> { "value" : NumberLong("-6148914691236517204") } on : shard1Set Timestamp(1, 0)
+                        { "value" : NumberLong("-6148914691236517204") } -->> { "value" : NumberLong("-3074457345618258602") } on : shard1Set Timestamp(1, 1)
+                        { "value" : NumberLong("-3074457345618258602") } -->> { "value" : NumberLong(0) } on : shard2Set Timestamp(1, 2)
+                        { "value" : NumberLong(0) } -->> { "value" : NumberLong("3074457345618258602") } on : shard2Set Timestamp(1, 3)
+                        { "value" : NumberLong("3074457345618258602") } -->> { "value" : NumberLong("6148914691236517204") } on : shard3Set Timestamp(1, 4)
+                        { "value" : NumberLong("6148914691236517204") } -->> { "value" : { "$maxKey" : 1 } } on : shard3Set Timestamp(1, 5)
+                test.c
+                        shard key: { "value" : 1 }
+                        unique: false
+                        balancing: true
+                        chunks:
+                                shard2Set	1
+                                shard3Set	1
+                        { "value" : { "$minKey" : 1 } } -->> { "value" : 10 } on : shard2Set Timestamp(1, 0)
+                        { "value" : 10 } -->> { "value" : { "$maxKey" : 1 } } on : shard3Set Timestamp(1, 1)
+                         tag: Zone2  { "value" : { "$minKey" : 1 } } -->> { "value" : 10 }
+                         tag: Zone3  { "value" : 10 } -->> { "value" : { "$maxKey" : 1 } }
+
+shard1Set:PRIMARY> rs.conf()
+{
+	"_id" : "shard1Set",
+	"version" : 3,
+	"term" : 2,
+	"protocolVersion" : NumberLong(1),
+	"writeConcernMajorityJournalDefault" : true,
+	"members" : [
+		{
+			"_id" : 0,
+			"host" : "mongo-sh1-replica:27017",
+			"arbiterOnly" : false,
+			"buildIndexes" : true,
+			"hidden" : false,
+			"priority" : 1,
+			"tags" : {
+
+			},
+			"slaveDelay" : NumberLong(0),
+			"votes" : 1
+		},
+		{
+			"_id" : 1,
+			"host" : "mongo-sh1-arbiter:27017",
+			"arbiterOnly" : true,
+			"buildIndexes" : true,
+			"hidden" : false,
+			"priority" : 0,
+			"tags" : {
+
+			},
+			"slaveDelay" : NumberLong(0),
+			"votes" : 1
+		}
+	],
+	"settings" : {
+		"chainingAllowed" : true,
+		"heartbeatIntervalMillis" : 2000,
+		"heartbeatTimeoutSecs" : 10,
+		"electionTimeoutMillis" : 10000,
+		"catchUpTimeoutMillis" : -1,
+		"catchUpTakeoverDelayMillis" : 30000,
+		"getLastErrorModes" : {
+
+		},
+		"getLastErrorDefaults" : {
+			"w" : 1,
+			"wtimeout" : 0
+		},
+		"replicaSetId" : ObjectId("5fd346a079509a9c2bfcf4e8")
+	}
+}
+
+shard1Set:PRIMARY> rs.status()
+{
+	"set" : "shard1Set",
+	"date" : ISODate("2020-12-14T20:36:38.196Z"),
+	"myState" : 1,
+	"term" : NumberLong(2),
+	"syncSourceHost" : "",
+	"syncSourceId" : -1,
+	"heartbeatIntervalMillis" : NumberLong(2000),
+	"majorityVoteCount" : 2,
+	"writeMajorityCount" : 1,
+	"votingMembersCount" : 2,
+	"writableVotingMembersCount" : 1,
+	"optimes" : {
+		"lastCommittedOpTime" : {
+			"ts" : Timestamp(1607978191, 2),
+			"t" : NumberLong(2)
+		},
+		"lastCommittedWallTime" : ISODate("2020-12-14T20:36:31.737Z"),
+		"readConcernMajorityOpTime" : {
+			"ts" : Timestamp(1607978191, 2),
+			"t" : NumberLong(2)
+		},
+		"readConcernMajorityWallTime" : ISODate("2020-12-14T20:36:31.737Z"),
+		"appliedOpTime" : {
+			"ts" : Timestamp(1607978191, 2),
+			"t" : NumberLong(2)
+		},
+		"durableOpTime" : {
+			"ts" : Timestamp(1607978191, 2),
+			"t" : NumberLong(2)
+		},
+		"lastAppliedWallTime" : ISODate("2020-12-14T20:36:31.737Z"),
+		"lastDurableWallTime" : ISODate("2020-12-14T20:36:31.737Z")
+	},
+	"lastStableRecoveryTimestamp" : Timestamp(1607978171, 1),
+	"electionCandidateMetrics" : {
+		"lastElectionReason" : "electionTimeout",
+		"lastElectionDate" : ISODate("2020-12-14T19:09:31.564Z"),
+		"electionTerm" : NumberLong(2),
+		"lastCommittedOpTimeAtElection" : {
+			"ts" : Timestamp(0, 0),
+			"t" : NumberLong(-1)
+		},
+		"lastSeenOpTimeAtElection" : {
+			"ts" : Timestamp(1607687467, 1),
+			"t" : NumberLong(1)
+		},
+		"numVotesNeeded" : 2,
+		"priorityAtElection" : 1,
+		"electionTimeoutMillis" : NumberLong(10000),
+		"numCatchUpOps" : NumberLong(0),
+		"newTermStartDate" : ISODate("2020-12-14T19:09:31.573Z"),
+		"wMajorityWriteAvailabilityDate" : ISODate("2020-12-14T19:09:31.582Z")
+	},
+	"members" : [
+		{
+			"_id" : 0,
+			"name" : "mongo-sh1-replica:27017",
+			"health" : 1,
+			"state" : 1,
+			"stateStr" : "PRIMARY",
+			"uptime" : 5243,
+			"optime" : {
+				"ts" : Timestamp(1607978191, 2),
+				"t" : NumberLong(2)
+			},
+			"optimeDate" : ISODate("2020-12-14T20:36:31Z"),
+			"syncSourceHost" : "",
+			"syncSourceId" : -1,
+			"infoMessage" : "",
+			"electionTime" : Timestamp(1607972971, 1),
+			"electionDate" : ISODate("2020-12-14T19:09:31Z"),
+			"configVersion" : 3,
+			"configTerm" : 2,
+			"self" : true,
+			"lastHeartbeatMessage" : ""
+		},
+		{
+			"_id" : 1,
+			"name" : "mongo-sh1-arbiter:27017",
+			"health" : 1,
+			"state" : 7,
+			"stateStr" : "ARBITER",
+			"uptime" : 5237,
+			"lastHeartbeat" : ISODate("2020-12-14T20:36:36.340Z"),
+			"lastHeartbeatRecv" : ISODate("2020-12-14T20:36:36.386Z"),
+			"pingMs" : NumberLong(0),
+			"lastHeartbeatMessage" : "",
+			"syncSourceHost" : "",
+			"syncSourceId" : -1,
+			"infoMessage" : "",
+			"configVersion" : 3,
+			"configTerm" : 2
+		}
+	],
+	"ok" : 1,
+	"$gleStats" : {
+		"lastOpTime" : Timestamp(0, 0),
+		"electionId" : ObjectId("7fffffff0000000000000002")
+	},
+	"lastCommittedOpTime" : Timestamp(1607978191, 2),
+	"$configServerState" : {
+		"opTime" : {
+			"ts" : Timestamp(1607978195, 1),
+			"t" : NumberLong(3)
+		}
+	},
+	"$clusterTime" : {
+		"clusterTime" : Timestamp(1607978195, 1),
+		"signature" : {
+			"hash" : BinData(0,"AAAAAAAAAAAAAAAAAAAAAAAAAAA="),
+			"keyId" : NumberLong(0)
+		}
+	},
+	"operationTime" : Timestamp(1607978191, 2)
+}
+
+shard1Set:PRIMARY> db.a.find()
+{ "_id" : ObjectId("5fd7c804610db5b65574b04b"), "value" : 0 }
+{ "_id" : ObjectId("5fd7c804610db5b65574b04c"), "value" : 1 }
+{ "_id" : ObjectId("5fd7c804610db5b65574b04d"), "value" : 2 }
+{ "_id" : ObjectId("5fd7c804610db5b65574b04e"), "value" : 3 }
+{ "_id" : ObjectId("5fd7c804610db5b65574b04f"), "value" : 4 }
+{ "_id" : ObjectId("5fd7c804610db5b65574b050"), "value" : 5 }
+{ "_id" : ObjectId("5fd7c804610db5b65574b051"), "value" : 6 }
+{ "_id" : ObjectId("5fd7c804610db5b65574b052"), "value" : 7 }
+{ "_id" : ObjectId("5fd7c804610db5b65574b053"), "value" : 8 }
+{ "_id" : ObjectId("5fd7c804610db5b65574b054"), "value" : 9 }
+{ "_id" : ObjectId("5fd7c804610db5b65574b055"), "value" : 10 }
+{ "_id" : ObjectId("5fd7c804610db5b65574b056"), "value" : 11 }
+{ "_id" : ObjectId("5fd7c804610db5b65574b057"), "value" : 12 }
+{ "_id" : ObjectId("5fd7c804610db5b65574b058"), "value" : 13 }
+{ "_id" : ObjectId("5fd7c804610db5b65574b059"), "value" : 14 }
+{ "_id" : ObjectId("5fd7c804610db5b65574b05a"), "value" : 15 }
+{ "_id" : ObjectId("5fd7c804610db5b65574b05b"), "value" : 16 }
+{ "_id" : ObjectId("5fd7c804610db5b65574b05c"), "value" : 17 }
+{ "_id" : ObjectId("5fd7c804610db5b65574b05d"), "value" : 18 }
+{ "_id" : ObjectId("5fd7c804610db5b65574b05e"), "value" : 19 }
+shard1Set:PRIMARY> db.b.find()
+{ "_id" : ObjectId("5fd7c813610db5b65574b065"), "value" : 6 }
+{ "_id" : ObjectId("5fd7c813610db5b65574b067"), "value" : 8 }
+{ "_id" : ObjectId("5fd7c813610db5b65574b06b"), "value" : 12 }
+shard1Set:PRIMARY> db.c.find()
+
+shard2Set:PRIMARY> db.a.find()
+shard2Set:PRIMARY> db.b.find()
+{ "_id" : ObjectId("5fd7c813610db5b65574b061"), "value" : 2 }
+{ "_id" : ObjectId("5fd7c813610db5b65574b062"), "value" : 3 }
+{ "_id" : ObjectId("5fd7c813610db5b65574b063"), "value" : 4 }
+{ "_id" : ObjectId("5fd7c813610db5b65574b06a"), "value" : 11 }
+{ "_id" : ObjectId("5fd7c813610db5b65574b06f"), "value" : 16 }
+shard2Set:PRIMARY> db.c.find()
+{ "_id" : ObjectId("5fd7ce963b4e7db60ab762cd"), "value" : 0 }
+{ "_id" : ObjectId("5fd7ce963b4e7db60ab762ce"), "value" : 1 }
+{ "_id" : ObjectId("5fd7ce963b4e7db60ab762cf"), "value" : 2 }
+{ "_id" : ObjectId("5fd7ce963b4e7db60ab762d0"), "value" : 3 }
+{ "_id" : ObjectId("5fd7ce963b4e7db60ab762d1"), "value" : 4 }
+{ "_id" : ObjectId("5fd7ce963b4e7db60ab762d2"), "value" : 5 }
+{ "_id" : ObjectId("5fd7ce963b4e7db60ab762d3"), "value" : 6 }
+{ "_id" : ObjectId("5fd7ce963b4e7db60ab762d4"), "value" : 7 }
+{ "_id" : ObjectId("5fd7ce963b4e7db60ab762d5"), "value" : 8 }
+{ "_id" : ObjectId("5fd7ce963b4e7db60ab762d6"), "value" : 9 }
+
+shard3Set:PRIMARY> db.a.find()
+shard3Set:PRIMARY> db.b.find()
+{ "_id" : ObjectId("5fd7c813610db5b65574b05f"), "value" : 0 }
+{ "_id" : ObjectId("5fd7c813610db5b65574b060"), "value" : 1 }
+{ "_id" : ObjectId("5fd7c813610db5b65574b064"), "value" : 5 }
+{ "_id" : ObjectId("5fd7c813610db5b65574b066"), "value" : 7 }
+{ "_id" : ObjectId("5fd7c813610db5b65574b068"), "value" : 9 }
+{ "_id" : ObjectId("5fd7c813610db5b65574b069"), "value" : 10 }
+{ "_id" : ObjectId("5fd7c813610db5b65574b06c"), "value" : 13 }
+{ "_id" : ObjectId("5fd7c813610db5b65574b06d"), "value" : 14 }
+{ "_id" : ObjectId("5fd7c813610db5b65574b06e"), "value" : 15 }
+{ "_id" : ObjectId("5fd7c813610db5b65574b070"), "value" : 17 }
+{ "_id" : ObjectId("5fd7c813610db5b65574b071"), "value" : 18 }
+{ "_id" : ObjectId("5fd7c813610db5b65574b072"), "value" : 19 }
+shard3Set:PRIMARY> db.c.find()
+{ "_id" : ObjectId("5fd7ce963b4e7db60ab762d7"), "value" : 10 }
+{ "_id" : ObjectId("5fd7ce973b4e7db60ab762d8"), "value" : 11 }
+{ "_id" : ObjectId("5fd7ce973b4e7db60ab762d9"), "value" : 12 }
+{ "_id" : ObjectId("5fd7ce973b4e7db60ab762da"), "value" : 13 }
+{ "_id" : ObjectId("5fd7ce973b4e7db60ab762db"), "value" : 14 }
+{ "_id" : ObjectId("5fd7ce973b4e7db60ab762dc"), "value" : 15 }
+{ "_id" : ObjectId("5fd7ce973b4e7db60ab762dd"), "value" : 16 }
+{ "_id" : ObjectId("5fd7ce973b4e7db60ab762de"), "value" : 17 }
+{ "_id" : ObjectId("5fd7ce973b4e7db60ab762df"), "value" : 18 }
+{ "_id" : ObjectId("5fd7ce973b4e7db60ab762e0"), "value" : 19 }
