@@ -1,0 +1,31 @@
+version: "3.3"
+services:
+  mongo-conf:
+    image: mongo
+    command: --configsvr --replSet confSet --bind_ip_all
+    volumes:
+      - ./conf.js:/docker-entrypoint-initdb.d/conf.js
+  mongo-sh1-replica:
+    command: --shardsvr --replSet shard1Set --bind_ip_all --port 27017
+    image: mongo
+    volumes:
+      - ./sh1-replica.js:/docker-entrypoint-initdb.d/sh1-replica.js
+  mongo-sh1-arbiter:
+    command: --shardsvr --replSet shard1Set --bind_ip_all --port 27017
+    image: mongo
+  mongo-sh2-replica:
+    command: --shardsvr --replSet shard2Set --bind_ip_all --port 27017
+    image: mongo
+    volumes:
+      - ./sh2-replica.js:/docker-entrypoint-initdb.d/sh2-replica.js
+  mongo-sh3-replica:
+    command: --shardsvr --replSet shard3Set --bind_ip_all --port 27017
+    image: mongo
+    volumes:
+      - ./sh3-replica.js:/docker-entrypoint-initdb.d/sh3-replica.js
+  mongos:
+    command: mongos --configdb confSet/mongo-conf:27019 --port 27017 --bind_ip_all
+    image: mongo
+    ports:
+      - 27017:27017
+
